@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 
 class RecommendationSystem:
@@ -100,8 +101,7 @@ class RecommendationSystem:
         return self.get_recommendations(user_books_titles, indices, df)
 
     def get_recommendations(self, titles, indices, df):
-        total_sim_scores = np.zeros(len(df))  # Inicializar un array de ceros
-        print(titles)
+        sim_scores_dict = {}  # Diccionario para almacenar las puntuaciones de similitud
 
         for title in titles:
             if title not in indices:
@@ -110,24 +110,46 @@ class RecommendationSystem:
             idx = indices[title]
             sim_scores = self.similarity_model.get_similarity_scores(idx)
 
-            # Sumar las puntuaciones de similitud para cada libro en el DataFrame
+            # Acumular las puntuaciones de similitud para cada libro en el diccionario
             for i, score in sim_scores:
-                total_sim_scores[i] += score
+                book_id = df.iloc[i]["book_id"]
+                if book_id in sim_scores_dict:
+                    sim_scores_dict[book_id].append(score)
+                else:
+                    sim_scores_dict[book_id] = [score]
 
-        # Calcular el promedio de las puntuaciones de similitud
-        avg_sim_scores = total_sim_scores / len(total_sim_scores)
+        # Calcular el promedio de las puntuaciones de similitud para cada libro
+        avg_sim_scores = {
+            book_id: sum(scores) / len(scores)
+            for book_id, scores in sim_scores_dict.items()
+        }
 
-        # Ordenar los índices de los libros según las puntuaciones de similitud en orden descendente
-        sorted_indices = np.argsort(avg_sim_scores)[::-1]
+        # Crear un DataFrame con los promedios y los book_id
+        avg_scores_df = pd.DataFrame(
+            list(avg_sim_scores.items()), columns=["book_id", "avg_score"]
+        )
 
-        # Excluir los libros originales y obtener los índices de los libros similares
-        excluded_indices = [indices[title] for title in titles]
-        filtered_indices = [i for i in sorted_indices if i not in excluded_indices]
+        # Fusionar con el DataFrame original para obtener todos los datos de los libros
+        merged_df = pd.merge(avg_scores_df, df, on="book_id")
 
-        # Seleccionar los índices de los libros más similares
-        top_book_indices = filtered_indices[:10]
+        # Agrupar por book_id y seleccionar la fila con el mayor promedio de puntuación de similitud para cada libro
+        grouped_df = (
+            merged_df.sort_values("avg_score", ascending=False)
+            .groupby("book_id")
+            .first()
+        )
 
-        # Devolver los datos de los libros recomendados
-        return df.iloc[top_book_indices].drop(
-            columns=["combined_features_clean", "combined_features"]
+        # Excluir los libros originales y seleccionar los top 10
+        excluded_book_ids = [df.iloc[indices[title]]["book_id"] for title in titles]
+        recommended_books = grouped_df[~grouped_df.index.isin(excluded_book_ids)].head(
+            10
+        )
+        # Ordenar el DataFrame por avg_score en orden descendente
+        ordered_df = recommended_books.sort_values(by="avg_score", ascending=False)
+        return ordered_df.drop(
+            columns=[
+                "combined_features_clean",
+                "combined_features",
+                "avg_score",
+            ]
         )

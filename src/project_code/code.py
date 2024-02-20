@@ -75,6 +75,9 @@ indices = pd.Series(df.index, index=df["title"]).to_dict()
 recommended_books = recommendation_system.get_recommendations_by_user(
     user_id="A252PRC1XBMTQJ", user_books_df=df, indices=indices, df=df
 )
+# print(
+#     recommendation_system.get_recommendations(["Dr. Seuss: American Icon"], indices, df)
+# )
 print(recommended_books)
 
 # Measure and print execution time
