@@ -24,82 +24,6 @@ class RecommendationSystem:
         """
         self.similarity_model = similarity_model
 
-    def get_recommendation(self, title, indices, df):
-        """
-        Generates a list of book recommendations based on the provided title.
-
-        This method first checks if the title exists in the dataset. It then uses the similarity model
-        to find similar books. The recommendations are sorted in descending order of similarity.
-
-        Args:
-            title (str): The title of the book for which recommendations are to be made.
-            indices (dict): A dictionary mapping titles to their respective indices in the dataset.
-            df (DataFrame): The dataframe containing book data.
-
-        Returns:
-            DataFrame: A DataFrame of the top 10 recommended books, excluding the input book.
-
-        Raises:
-            ValueError: If the title is not found in the dataset.
-        """
-        if title not in indices:
-            raise ValueError("Title not found in dataset")
-
-        idx = indices[title]
-        book_id_original = df.at[idx, "book_id"]
-        sim_scores = self.similarity_model.get_similarity_scores(idx)
-
-        # Sort the similarity scores in descending order
-        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-
-        # Exclude the original book and get indices of similar books
-        book_indices = [
-            i[0] for i in sim_scores if df.at[i[0], "book_id"] != book_id_original
-        ]
-
-        # Get the top 10 similar books
-        book_indices = book_indices[0:10]
-
-        # Return the recommended book data
-        return df.iloc[book_indices].drop(
-            columns=["combined_features_clean", "combined_features"]
-        )
-
-    def get_recommendations_by_user(self, user_id, user_books_df, indices, df):
-        """
-        Generates a list of book recommendations for a given user ID.
-
-        Args:
-            user_id (int): The ID of the user for whom recommendations are to be made.
-            user_books_df (DataFrame): The dataframe containing user-book associations.
-            indices (dict): A dictionary mapping titles to their respective indices in the dataset.
-            df (DataFrame): The dataframe containing book data.
-
-        Returns:
-            DataFrame: A DataFrame of the top recommended books, excluding the books read by the user.
-
-        Raises:
-            ValueError: If the user ID is not found in the dataset.
-        """
-
-        if user_id not in user_books_df["user_id"].values:
-            raise ValueError("User ID not found in dataset")
-        user_books = df[df["user_id"] == user_id]
-        user_books_titles = user_books["title"].tolist()
-        # Get all books read by the user
-        # user_books = user_books_df[user_books_df["user_id"] == user_id][
-        #     "book_id"
-        # ].tolist()
-
-        # # Convert book IDs to titles
-        # user_books_titles = df[df["book_id"].isin(user_books)]["title"].tolist()
-
-        # # Ensure that the books are in the indices dictionary
-        # user_books_titles = [title for title in user_books_titles if title in indices]
-
-        # Now use the existing logic to get recommendations based on these titles
-        return self.get_recommendations(user_books_titles, indices, df)
-
     def get_recommendations(self, titles, indices, df):
         sim_scores_dict = {}  # Diccionario para almacenar las puntuaciones de similitud
 
@@ -112,44 +36,35 @@ class RecommendationSystem:
 
             # Acumular las puntuaciones de similitud para cada libro en el diccionario
             for i, score in sim_scores:
-                book_id = df.iloc[i]["book_id"]
-                if book_id in sim_scores_dict:
-                    sim_scores_dict[book_id].append(score)
+                title = df.iloc[i]["title"]
+                if title in sim_scores_dict:
+                    sim_scores_dict[title].append(score)
                 else:
-                    sim_scores_dict[book_id] = [score]
+                    sim_scores_dict[title] = [score]
 
         # Calcular el promedio de las puntuaciones de similitud para cada libro
         avg_sim_scores = {
-            book_id: sum(scores) / len(scores)
-            for book_id, scores in sim_scores_dict.items()
+            title: sum(scores) / len(scores)
+            for title, scores in sim_scores_dict.items()
         }
 
-        # Crear un DataFrame con los promedios y los book_id
+        # Crear un DataFrame con los promedios y los títulos
         avg_scores_df = pd.DataFrame(
-            list(avg_sim_scores.items()), columns=["book_id", "avg_score"]
+            list(avg_sim_scores.items()), columns=["title", "avg_score"]
         )
 
         # Fusionar con el DataFrame original para obtener todos los datos de los libros
-        merged_df = pd.merge(avg_scores_df, df, on="book_id")
+        merged_df = pd.merge(avg_scores_df, df, on="title")
 
-        # Agrupar por book_id y seleccionar la fila con el mayor promedio de puntuación de similitud para cada libro
-        grouped_df = (
-            merged_df.sort_values("avg_score", ascending=False)
-            .groupby("book_id")
-            .first()
-        )
+        # Excluir los libros originales
+        merged_df = merged_df[~merged_df["title"].isin(titles)]
 
-        # Excluir los libros originales y seleccionar los top 10
-        excluded_book_ids = [df.iloc[indices[title]]["book_id"] for title in titles]
-        recommended_books = grouped_df[~grouped_df.index.isin(excluded_book_ids)].head(
-            10
-        )
         # Ordenar el DataFrame por avg_score en orden descendente
-        ordered_df = recommended_books.sort_values(by="avg_score", ascending=False)
-        return ordered_df.drop(
-            columns=[
-                "combined_features_clean",
-                "combined_features",
-                "avg_score",
-            ]
-        )
+        ordered_df = merged_df.sort_values(by="avg_score", ascending=False)
+
+        ordered_df = ordered_df.head(10)
+
+        # Eliminar la columna innecesaria
+        final_df = ordered_df.drop(columns=["combined_features"])
+
+        return final_df

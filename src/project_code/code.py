@@ -37,47 +37,42 @@ preprocess = PreprocessingUtils()
 
 # Load and preprocess dataset
 if os.path.exists(enviroments.completedPath):
-    df = pd.read_csv(enviroments.completedPath)
+    data = pd.read_csv(enviroments.completedPath)
 else:
-    df = pd.read_csv(enviroments.rawPaht)
-    df.rename(
-        columns={
-            "Id": "book_id",
-            "User_id": "user_id",
-            "review/text": "review",
-            "Title": "title",
-            "review/score": "rating",
-        },
-        inplace=True,
+    data = pd.read_csv(enviroments.rawPaht)
+    data["combined_features"] = (
+        data["title"].apply(preprocess.clean)
+        + " "
+        + data["summary"].apply(preprocess.clean)
     )
-    df = df.head(10000)
-    df["combined_features"] = df["title"] + " " + df["review"]
-    df["combined_features"] = df["combined_features"].fillna("")
+    data["combined_features"] = data["combined_features"].fillna("")
 
     # Aplicar preprocesamiento a la columna combinada
-    df["combined_features_clean"] = df["combined_features"].apply(
-        preprocess.preprocess_data
+    data["combined_features"] = data["combined_features"].apply(
+        preprocess.data_preprocessing
     )
-    # Guardar datos preprocesados
-    df.to_csv(enviroments.completedPath, index=False)
 
+    # Guardar datos preprocesados
+    data.to_csv(enviroments.completedPath, index=False)
 
 # Text modeling, similarity modeling, and recommendation system
 text_model = TfidfModel()
-tfidf_matrix_reduced = text_model.fit_transform(df["combined_features_clean"])
+tfidf_matrix_reduced = text_model.fit_transform(data["combined_features"])
 similarity_model = SimilarityModel(tfidf_matrix_reduced)
 recommendation_system = RecommendationSystem(similarity_model)
 
 # Creating indices for recommendations
-indices = pd.Series(df.index, index=df["title"]).to_dict()
+indices = pd.Series(data.index, index=data["title"]).to_dict()
 
 # Generate and print recommendations
-recommended_books = recommendation_system.get_recommendations_by_user(
-    user_id="A252PRC1XBMTQJ", user_books_df=df, indices=indices, df=df
+recommended_books = recommendation_system.get_recommendations(
+    titles=[
+        "Queen Ann in Oz",
+    ],
+    indices=indices,
+    df=data,
 )
-# print(
-#     recommendation_system.get_recommendations(["Dr. Seuss: American Icon"], indices, df)
-# )
+
 print(recommended_books)
 
 # Measure and print execution time
