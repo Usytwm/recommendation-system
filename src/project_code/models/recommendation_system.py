@@ -1,3 +1,7 @@
+import numpy as np
+import pandas as pd
+
+
 class RecommendationSystem:
     """
     A class to represent a recommendation system.
@@ -20,43 +24,47 @@ class RecommendationSystem:
         """
         self.similarity_model = similarity_model
 
-    def get_recommendations(self, title, indices, df):
-        """
-        Generates a list of book recommendations based on the provided title.
+    def get_recommendations(self, titles, indices, df):
+        sim_scores_dict = {}  # Diccionario para almacenar las puntuaciones de similitud
 
-        This method first checks if the title exists in the dataset. It then uses the similarity model
-        to find similar books. The recommendations are sorted in descending order of similarity.
+        for title in titles:
+            if title not in indices:
+                raise ValueError(f"Title '{title}' not found in dataset")
 
-        Args:
-            title (str): The title of the book for which recommendations are to be made.
-            indices (dict): A dictionary mapping titles to their respective indices in the dataset.
-            df (DataFrame): The dataframe containing book data.
+            idx = indices[title]
+            sim_scores = self.similarity_model.get_similarity_scores(idx)
 
-        Returns:
-            DataFrame: A DataFrame of the top 10 recommended books, excluding the input book.
+            # Acumular las puntuaciones de similitud para cada libro en el diccionario
+            for i, score in sim_scores:
+                title = df.iloc[i]["title"]
+                if title in sim_scores_dict:
+                    sim_scores_dict[title].append(score)
+                else:
+                    sim_scores_dict[title] = [score]
 
-        Raises:
-            ValueError: If the title is not found in the dataset.
-        """
-        if title not in indices:
-            raise ValueError("Title not found in dataset")
+        # Calcular el promedio de las puntuaciones de similitud para cada libro
+        avg_sim_scores = {
+            title: sum(scores) / len(scores)
+            for title, scores in sim_scores_dict.items()
+        }
 
-        idx = indices[title]
-        book_id_original = df.at[idx, "book_id"]
-        sim_scores = self.similarity_model.get_similarity_scores(idx)
-
-        # Sort the similarity scores in descending order
-        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-
-        # Exclude the original book and get indices of similar books
-        book_indices = [
-            i[0] for i in sim_scores if df.at[i[0], "book_id"] != book_id_original
-        ]
-
-        # Get the top 10 similar books
-        book_indices = book_indices[0:10]
-
-        # Return the recommended book data
-        return df.iloc[book_indices].drop(
-            columns=["combined_features_clean", "combined_features"]
+        # Crear un DataFrame con los promedios y los títulos
+        avg_scores_df = pd.DataFrame(
+            list(avg_sim_scores.items()), columns=["title", "avg_score"]
         )
+
+        # Fusionar con el DataFrame original para obtener todos los datos de los libros
+        merged_df = pd.merge(avg_scores_df, df, on="title")
+
+        # Excluir los libros originales
+        merged_df = merged_df[~merged_df["title"].isin(titles)]
+
+        # Ordenar el DataFrame por avg_score en orden descendente
+        ordered_df = merged_df.sort_values(by="avg_score", ascending=False)
+
+        ordered_df = ordered_df.head(10)
+
+        # Eliminar la columna innecesaria
+        final_df = ordered_df.drop(columns=["combined_features"])
+
+        return final_df

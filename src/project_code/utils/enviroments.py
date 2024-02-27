@@ -1,5 +1,7 @@
 # Path to the raw dataset file for book ratings
-rawPaht = "D:/Escuela/Projects/SRI/recommendation-system/src/project_code/data/raw/Books_rating.csv"
+rawPaht = (
+    "D:/Escuela/Projects/SRI/recommendation-system/src/project_code/data/raw/data.csv"
+)
 
 # Path to the processed dataset file where the completed book ratings will be stored
 completedPath = "D:/Escuela/Projects/SRI/recommendation-system/src/project_code/data/processed/Books_rating_completed.csv"

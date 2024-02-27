@@ -1,5 +1,8 @@
 import re
 import string
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 import nltk
@@ -27,49 +30,33 @@ class PreprocessingUtils:
         except LookupError:
             nltk.download("stopwords")
             self.stop_words = set(stopwords.words("english"))
-        if "stemmer" not in globals():
-            self.stemmer = SnowballStemmer("english")
 
-    def clean_text(self, text):
-        """
-        Cleans a given text by performing a series of regex operations.
+    def clean(self, text):
+        text = text.lower()  # Converting to lowerCase
+        text = re.sub(
+            "[%s]" % re.escape(string.punctuation), " ", text
+        )  # removing punctuation
 
-        Steps:
-        1. Converts to lower case.
-        2. Removes text within square brackets.
-        3. Removes URLs.
-        4. Removes HTML tags.
-        5. Removes punctuation.
-        6. Removes new lines.
-        7. Removes words containing numbers.
+        text_tokens = word_tokenize(text)  # removing stopwords
+        tw = [word for word in text_tokens if not word in self.stop_words]
+        text = (" ").join(tw)
 
-        Args:
-            text (str): The text to be cleaned.
+        splt = text.split(" ")
+        output = [x for x in splt if len(x) > 3]  # removing words with length<=3
+        text = (" ").join(output)
 
-        Returns:
-            str: The cleaned text.
-        """
-        text = str(text).lower()
-        text = re.sub("\[.*?\]", "", text)
-        text = re.sub("https?://\S+|www\.\S+", "", text)
-        text = re.sub("<.*?>+", "", text)
-        text = re.sub("[%s]" % re.escape(string.punctuation), "", text)
-        text = re.sub("\n", "", text)
-        text = re.sub("\w*\d\w*", "", text)
+        text = re.sub(r"\s+[a-zA-Z]\s+", " ", text)  # removing single character
+        text = re.sub("<.*?>+", " ", text)  # removing HTML Tags
+        text = re.sub("\n", " ", text)  # removal of new line characters
+        text = re.sub(r"\s+", " ", text)  # removal of multiple spaces
         return text
 
-    def preprocess_data(self, text):
-        """
-        Preprocesses the given text by cleaning it and then removing stopwords and
-        stemming the words.
-
-        Args:
-            text (str): The text to be preprocessed.
-
-        Returns:
-            str: The preprocessed text.
-        """
-        text = self.clean_text(text)
-        text = " ".join(word for word in text.split() if word not in self.stop_words)
-        text = " ".join(self.stemmer.stem(word) for word in text.split())
-        return text
+    def data_preprocessing(self, text):
+        tokens = word_tokenize(text)  # Tokenization
+        tokens = [
+            WordNetLemmatizer().lemmatize(word) for word in tokens
+        ]  # Lemmetization
+        tokens = [
+            SnowballStemmer(language="english").stem(word) for word in tokens
+        ]  # Stemming
+        return " ".join(tokens)
