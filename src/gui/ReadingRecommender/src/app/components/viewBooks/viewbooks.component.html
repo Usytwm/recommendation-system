@@ -1,0 +1,29 @@
+<div #descriptionContainer class="row align-items-md-stretch full-height">
+  <div class="col-md-5">
+    <div class="h-100 p-5 rounded-3 scrollable-content">
+      <div class="list-group">
+        <a
+          *ngFor="let book of books"
+          (click)="selectBook(book)"
+          class="list-group-item list-group-item-action bg-body-tertiary border"
+        >
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ book.title }}</h5>
+          </div>
+          <p class="mb-1 description">{{ book.descripcion }}</p>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div
+      style="margin-top: 3rem"
+      class="h-100 p-5 text-bg-dark border rounded-3 scrollable-content"
+    >
+      <h2 class="book-title">{{ selectedBook?.title || "Select a book" }}</h2>
+      <p class="book-description">
+        {{ selectedBook?.descripcion || "Book description will appear here." }}
+      </p>
+    </div>
+  </div>
+</div>
