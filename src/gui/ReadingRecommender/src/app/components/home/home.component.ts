@@ -46,6 +46,7 @@ export class HomeComponent implements OnInit {
     const queryArray = matches
       ? matches.map((match) => match.replace(/"/g, ''))
       : [];
+
     this.loading = true;
     this._service.search(queryArray).subscribe((data: any) => {
       console.log(data);
