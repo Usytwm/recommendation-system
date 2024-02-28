@@ -94,6 +94,29 @@ El sistema se compone de varios módulos:
 
 - El flujo del sistema inicia con la carga de datos, seguido por el preprocesamiento, la vectorización TF-IDF, el cálculo de similitudes y, finalmente, la generación de recomendaciones.
 
+## Cómo Realizar Consultas en el Sistema
+
+Para asegurar resultados precisos al usar el sistema de recomendación, es importante seguir el formato correcto al introducir las búsquedas. A continuación, se muestran las pautas sobre cómo formular las consultas:
+
+### Formato de Consulta
+
+- **Uso de Comillas**: Encierra cada término de búsqueda entre comillas dobles (`" "`).
+- **Separación por Espacios**: Separa diferentes términos de búsqueda con un espacio.
+
+### Ejemplo de Consulta
+
+Si deseas buscar recomendaciones relacionadas con los titulos "Drowned Wednesday" "The Eyes of the Overworld" "The Thief", deberas escribir la consulta de la siguiente manera en el buscador:
+
+```arduino
+ "Drowned Wednesday" "The Eyes of the Overworld" "The Thief"
+```
+
+### Ilustración de Ejemplo
+
+A continuación, se muestra un ejemplo visual de cómo se veria esta consulta en el buscador:
+
+![Ejemplo de Consulta en el Buscador](./media/image.png)
+
 ## Insuficiencias y Mejoras Propuestas
 
 El sistema actual, aunque funcional, podría mejorar en aspectos como:
