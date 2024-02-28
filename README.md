@@ -20,6 +20,41 @@ Durante el desarrollo se consideró:
 - La necesidad de calcular la similitud del coseno para identificar libros con contenido similar.
 - La escalabilidad y eficiencia del sistema al manejar grandes conjuntos de datos.
 
+## Requisitos Previos
+
+Antes de seguir los pasos para ejecutar el sistema de recomendación, asegúrate de tener instalado lo siguiente en tu máquina:
+
+### Software y Herramientas
+
+- **Git**: Necesario para clonar el repositorio del proyecto. Si no lo tienes instalado, puedes descargarlo desde [https://git-scm.com/](https://git-scm.com/).
+- **Python**: El proyecto requiere Python para ejecutar el backend y las dependencias. Asegúrate de tener Python 3.8 o superior. Puedes descargarlo desde [https://www.python.org/downloads/](https://www.python.org/downloads/).
+- **npm**: Necesario para instalar las dependencias de Angular para la interfaz gráfica. npm viene incluido con Node.js, que puedes obtener desde [https://nodejs.org/](https://nodejs.org/).
+
+### Verificación de la Instalación
+
+Para verificar que las herramientas necesarias están instaladas correctamente, puedes utilizar los siguientes comandos en tu terminal o línea de comandos:
+
+- Para **Git**:
+
+  ```bash
+  git --version
+  ```
+
+- Para **Python**:
+
+  ```bash
+  python --version
+  ```
+
+- Para **npm** y **Node.js**:
+
+  ```bash
+  node --version
+  npm --version
+  ```
+
+Si los comandos anteriores retornan las versiones de las herramientas, significa que ya están instaladas correctamente y se puede proceder con la ejecución del proyecto.
+
 ## Ejecución del Proyecto
 
 Para ejecutar el sistema de recomendación, sigue los siguientes pasos:
@@ -33,9 +68,16 @@ Para ejecutar el sistema de recomendación, sigue los siguientes pasos:
    ```bash
    pip install -r requirements.txt
    ```
-3. Ejecuta el startup.bat
+3. Instala las dependencias de angular:
+
    ```bash
-   startup.bat
+   cd gui/ReadingRecommender
+   npm install
+   ```
+
+4. Dirigete a la carpeta principal y ejecuta el startup.bat con el siguinte comando
+   ```bash
+   ./startup.bat
    ```
 
 ## Explicación de la Solución
