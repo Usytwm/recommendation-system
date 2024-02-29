@@ -9,7 +9,7 @@ from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 import nltk
 
-nltk.download('punkt')
+
 class PreprocessingUtils:
     """
     A utility class for preprocessing textual data. This class includes methods
@@ -31,8 +31,12 @@ class PreprocessingUtils:
             self.stop_words = set(stopwords.words("english"))
         except LookupError:
             nltk.download("stopwords")
-            nltk.download('punkt')
+            nltk.download("punkt")
             self.stop_words = set(stopwords.words("english"))
+        try:
+            nltk.data.find("tokenizers/punkt")
+        except LookupError:
+            nltk.download("punkt")
 
     def clean(self, text):
         text = text.lower()  # Converting to lowerCase
