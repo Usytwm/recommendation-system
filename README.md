@@ -71,7 +71,7 @@ Para ejecutar el sistema de recomendación, sigue los siguientes pasos:
 3. Instala las dependencias de angular:
 
    ```bash
-   cd gui/ReadingRecommender
+   cd src/gui/ReadingRecommender
    npm install
    ```
 
