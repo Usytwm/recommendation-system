@@ -1,0 +1,7 @@
+.logo-icon {
+  width: 70px; /* ajusta este valor según el tamaño deseado */
+  height: auto; /* para mantener la proporción */
+}
+.search-button:hover {
+  background-color: rgb(144, 147, 248);
+}

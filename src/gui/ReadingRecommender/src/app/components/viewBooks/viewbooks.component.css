@@ -1,0 +1,40 @@
+.description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Número de líneas que quieres mostrar */
+  -webkit-box-orient: vertical;
+  max-height: 4.5em; /* Ajusta según el tamaño de tu fuente y el espacio deseado */
+}
+.list-group-item-action:hover {
+  background-color: rgb(201, 202, 240) !important; /* O el color que desees */
+  box-shadow: 0 8px 16px rgb(201, 202, 240); /* Ejemplo de box-shadow */
+}
+.list-group-item-action {
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Ajusta la duración y el tipo de transición según prefieras */
+}
+
+/* Asegura que el contenedor de la fila se expanda al 100% de la altura de la ventana */
+.full-height {
+  min-height: 70vh; /* Usa min-height para asegurar que se expanda según el contenido */
+}
+
+/* Estilos para permitir el desplazamiento dentro de cada columna si el contenido es muy largo */
+
+.scrollable-content {
+  overflow-y: auto; /* Habilita el desplazamiento vertical si es necesario */
+  max-height: 70vh; /* Limita el alto máximo para activar el desplazamiento */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  overflow-y: scroll;
+}
+.scrollable-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.book-title,
+.book-description {
+  word-wrap: break-word; /* Asegura que las palabras se corten correctamente para evitar desbordamiento */
+  white-space: pre-wrap; /* Mantiene el espacio en blanco, pero permite saltos de línea naturales y forzados */
+}

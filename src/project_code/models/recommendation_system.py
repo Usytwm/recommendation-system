@@ -29,7 +29,7 @@ class RecommendationSystem:
 
         for title in titles:
             if title not in indices:
-                raise ValueError(f"Title '{title}' not found in dataset")
+                continue
 
             idx = indices[title]
             sim_scores = self.similarity_model.get_similarity_scores(idx)
@@ -41,6 +41,9 @@ class RecommendationSystem:
                     sim_scores_dict[title].append(score)
                 else:
                     sim_scores_dict[title] = [score]
+
+        if not sim_scores_dict:
+            return pd.DataFrame(columns=df.columns)
 
         # Calcular el promedio de las puntuaciones de similitud para cada libro
         avg_sim_scores = {

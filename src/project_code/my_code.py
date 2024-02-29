@@ -30,12 +30,12 @@ Execution Steps:
 6. Measure and display the execution time.
 """
 
-def MRI (query):
+
+def MRI(query):
     # Measure start time
     start_time = time.time()
     # Preprocessing data
     preprocess = PreprocessingUtils()
-
 
     # Load and preprocess dataset
     if os.path.exists(enviroments.completedPath):
@@ -68,14 +68,14 @@ def MRI (query):
 
     # Generate and print recommendations
     recommended_books = recommendation_system.get_recommendations(
-        titles= query,
+        titles=query,
         indices=indices,
         df=data,
     )
 
-    #print(recommended_books)
+    # print(recommended_books)
 
     # Measure and print execution time
-    #end_time = time.time()
-    #print("Tiempo de ejecución:", end_time - start_time, "segundos")
+    # end_time = time.time()
+    # print("Tiempo de ejecución:", end_time - start_time, "segundos")
     return recommended_books
