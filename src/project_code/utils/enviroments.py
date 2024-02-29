@@ -4,7 +4,7 @@ import os
 ruta_actual = (os.path.realpath(__file__))[:-len("utils\enviroments.py")] 
 
 rawPaht = (
-    ruta + "data/raw/data.csv"
+    ruta_actual + "data/raw/data.csv"
 )
 
 # Path to the processed dataset file where the completed book ratings will be stored
