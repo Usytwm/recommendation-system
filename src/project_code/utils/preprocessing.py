@@ -56,7 +56,4 @@ class PreprocessingUtils:
         tokens = [
             WordNetLemmatizer().lemmatize(word) for word in tokens
         ]  # Lemmetization
-        tokens = [
-            SnowballStemmer(language="english").stem(word) for word in tokens
-        ]  # Stemming
         return " ".join(tokens)
