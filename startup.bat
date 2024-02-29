@@ -11,9 +11,13 @@ echo [Navegando al directorio src...]
 cd src
 echo ----------Completado----------
 
+@echo off
+echo [Ejecutando Server...]
+start cmd /k "python project_code\app.py & echo ----------Completado---------- & pause"
+
 echo [Ejecutando script de GUI...]
-python project_code\code.py
-echo ----------Completado----------
+start cmd /k "cd gui/ReadingRecommender && ng serve -o & echo ---- & pause"
+
 
 echo [Regresando al directorio raiz...]
 cd ..
