@@ -1,5 +1,7 @@
 import re
 import string
+import nltk
+
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.snowball import SnowballStemmer
@@ -7,7 +9,7 @@ from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 import nltk
 
-
+nltk.download('punkt')
 class PreprocessingUtils:
     """
     A utility class for preprocessing textual data. This class includes methods
@@ -29,6 +31,7 @@ class PreprocessingUtils:
             self.stop_words = set(stopwords.words("english"))
         except LookupError:
             nltk.download("stopwords")
+            nltk.download('punkt')
             self.stop_words = set(stopwords.words("english"))
 
     def clean(self, text):
